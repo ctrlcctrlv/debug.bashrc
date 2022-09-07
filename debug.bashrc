@@ -65,6 +65,17 @@ debugsh_init() {
     fi
     return 0
 }
+Deval() {
+    local BASH_SETTINGS="$-"
+    set -xv
+    # Runs the command. As safe as the original command :^)
+    $@
+    for setting in x v; do
+        if [[ ! $setting =~ $BASH_SETTINGS ]]; then
+            set "+$setting"
+        fi
+    done
+}
 
 export AHA_BASH_PRINT_ARGS='--black'
 
