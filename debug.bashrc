@@ -1,10 +1,4 @@
 #!/usr/bin/env bash
-debugsh_init() {
-    ( (hash pygmentize && syntaxhighlighter pygmentize) 2> /dev/null;
-      (hash vimpager && syntaxhighlighter vimpager) 2> /dev/null )
-    >&2 echo == debug.sh loaded ==;
-    [ ! -z "$BASH_SYNTAXHIGHLIGHTER_BINREQ" ] && >&2 echo "default syntax highlighter: $BASH_SYNTAXHIGHLIGHTER_BINREQ"
-}
 syntaxhighlight_vimpager () {
     ARG=`printf "%q" "$1"`;
     script -E never -q -c "tee|vimpager --force-passthrough -c 'set syntax=$ARG' -c 'setf $ARG'";
@@ -13,35 +7,36 @@ syntaxhighlight_pygmentize() {
     tee | pygmentize -l "$1";
 }
 syntaxhighlighter() {
-    [ $(declare -fF syntaxhighlight) ] && unset syntaxhighlight;
     shopt -s nocasematch
-    export BASH_SYNTAXHIGHLIGHTER_BINREQ="$1"
-    function __d_return() {
+    __d_return() {
         shopt -u nocasematch;
         unset __d_return; # Yes this is valid.
     }
     case "$1" in
         pygmentize)
-            syntaxhighlight() {
+            function syntaxhighlight() {
                 syntaxhighlight_pygmentize "$@";
-            };
+            }
         ;;
         vimpager)
-            syntaxhighlight() {
+            function syntaxhighlight() {
                 syntaxhighlight_vimpager "$@";
-            };
+            }
         ;;
         *)
             syntaxhighlighter pygmentize;
             >&2 echo "Unrecognized highlighter!: $1";
-            __d_return
+            __d_return pygmentize
         ;;
     esac
     case "$1" in
-        pygmentize|vimpager) >&2 echo "Syntax highlighter now $1"
+        pygmentize|vimpager) echo "Syntax highlighter now $1"
         ;;
     esac
-    __d_return
+    declare -gfx syntaxhighlight
+    declare -gx BASH_SYNTAXHIGHLIGHTER_BINREQ="$1"
+    __d_return "$1"
+    return 0
 }
 print_bash_function () { 
     type "$1" | tail -n +2;
@@ -53,7 +48,25 @@ print_all_bash_functions() {
     HIGHLIGHT_CMD="list_all_bash_functions "`printf '%q' "$1"`" | while read line; do print_bash_function \$line | syntaxhighlight bash; done"
     [ ! -z "$2" ] && (eval $HIGHLIGHT_CMD | aha $AHA_BASH_PRINT_ARGS > "$2") || (>&2 eval $HIGHLIGHT_CMD)
 }
+debugsh_init() {
+    if [ ! -z "$BASH_SYNTAXHIGHLIGHTER_BINREQ" ]; then
+        syntaxhighlighter "$BASH_SYNTAXHIGHLIGHTER_BINREQ"
+    elif hash pygmentize; then
+        syntaxhighlighter pygmentize
+    elif hash vimpager; then
+        syntaxhighlighter vimpager
+    fi > /dev/null
+    if [ ! -z $BASH_SYNTAXHIGHLIGHTER_BINREQ ]; then
+        echo "default syntax highlighter: $BASH_SYNTAXHIGHLIGHTER_BINREQ"
+        return 0
+    else
+        >&2 echo "no syntaxhighlighter loaded"
+        return 1
+    fi
+    echo == debug.sh loaded ==
+    return 0
+}
 
-export AHA_BASH_PRINT_ARGS='--black';
+export AHA_BASH_PRINT_ARGS='--black'
 
-debugsh_init;
+debugsh_init && declare -gfx syntaxhighlight
