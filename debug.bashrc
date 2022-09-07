@@ -26,7 +26,7 @@ syntaxhighlighter() {
         *)
             syntaxhighlighter pygmentize;
             >&2 echo "Unrecognized highlighter!: $1";
-            __d_return pygmentize
+            __d_return
         ;;
     esac
     case "$1" in
@@ -35,7 +35,7 @@ syntaxhighlighter() {
     esac
     declare -gfx syntaxhighlight
     declare -gx BASH_SYNTAXHIGHLIGHTER_BINREQ="$1"
-    __d_return "$1"
+    __d_return
     return 0
 }
 print_bash_function () { 
@@ -63,7 +63,6 @@ debugsh_init() {
         >&2 echo "no syntaxhighlighter loaded"
         return 1
     fi
-    echo == debug.sh loaded ==
     return 0
 }
 
