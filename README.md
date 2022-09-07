@@ -69,6 +69,17 @@ $ head -n 10 < /tmp/functions.html | syntaxhighlight html
 <body style="color:white; background-color:black">
 <pre>
 ```
+## Configuration
+
+### `$BASH_SYNTAXHIGHLIGHTER_BINREQ`
+
+You may add e.g.:
+
+```bash
+export BASH_SYNTAXHIGHLIGHTER_BINREQ="vimpager"
+```
+
+*Before* sourcing debug.bashrc, to use `vimpager` instead of `pygmentize` as default syntax highlighter.
 
 ## License
 
