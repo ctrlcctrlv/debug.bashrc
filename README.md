@@ -15,31 +15,31 @@ $ echo $'\n# Load debug functions\n. ~/.bash/debug.bashrc' >> ~/.bash_profile
 $ . ~/.bashrc
 $ syntaxhighlighter pygmentize
 $ print_bash_function syntaxhighlight | syntaxhighlight bash
-syntaxhighlight () 
-{ 
+syntaxhighlight ()
+{
     syntaxhighlight_pygmentize "$@"
 }
 $ syntaxhighlighter vimpager
 $ print_bash_function syntaxhighlight | syntaxhighlight bash
-syntaxhighlight () 
-{ 
+syntaxhighlight ()
+{
     syntaxhighlight_vimpager "$@"
 }
 $ syntaxhighlighter pygmentize && print_bash_function syntaxhighlighter | syntaxhighlight bash
-syntaxhighlighter () 
-{ 
+syntaxhighlighter ()
+{
     [ $(declare -fF syntaxhighlight) ] && unset syntaxhighlight || true;
     shopt -s nocasematch;
-    case "$1" in 
+    case "$1" in
         pygmentize)
-            function syntaxhighlight () 
-            { 
+            function syntaxhighlight ()
+            {
                 syntaxhighlight_pygmentize "$@"
             }
         ;;
         vimpager)
-            function syntaxhighlight () 
-            { 
+            function syntaxhighlight ()
+            {
                 syntaxhighlight_vimpager "$@"
             }
         ;;
@@ -80,6 +80,43 @@ export BASH_SYNTAXHIGHLIGHTER_BINREQ="vimpager"
 ```
 
 *Before* sourcing debug.bashrc, to use `vimpager` instead of `pygmentize` as default syntax highlighter.
+
+## Plugins
+
+### `Ddiffshopt`
+
+```bash
+(base) fred@マパチェ🦝⟿ ~$ shopt -u expand_aliases
+(base) fred@マパチェ🦝⟿ ~$ Ddiffshopt
+# Recall: Additions are changes from default to current subshell.
+#	Lines with no red words for context only.
+
+shopt -u dotglob
+shopt -u execfail
+shopt [--s-] {+-u+} expand_aliases
+shopt -u extdebug
+shopt -s extglob
+```
+
+### `Deval`
+
+```bash
+$ Deval 'for f in x a d; do echo $f; done'
++ eval for f in x a 'd;' do echo '$f;' done
+for f in x a d; do echo $f; done
+++ for f in x a d
+++ echo x
+x
+++ for f in x a d
+++ echo a
+a
+++ for f in x a d
+++ echo d
+d
++ for setting in x v
++ [[ ! x =~ himBHs ]]
++ set +x
+```
 
 ## License
 

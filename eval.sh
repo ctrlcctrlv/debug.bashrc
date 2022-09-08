@@ -9,7 +9,7 @@ Deval() {
     : "${__DEBUG_EVAL_SET:=-xv}"
     set "$__DEBUG_EVAL_SET"
     # Runs the command. As safe as the original command :^)
-    $@
+    eval $@
     for setting in x v; do
         if [[ ! $setting =~ $BASH_SETTINGS ]]; then
             set "+$setting"
