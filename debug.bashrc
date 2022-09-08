@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+# This can't go in debugsh_init as we don't want invalid syntax to be read if it can be helped.
+if test "`basename $SHELL`" != "bash"; then
+    >&2 echo "Using $SHELL, not Bash, dying!"
+    exit 1
+fi
 syntaxhighlight_vimpager () {
     ARG=`printf "%q" "$1"`;
     script -E never -q -c "tee|vimpager --force-passthrough -c 'set syntax=$ARG' -c 'setf $ARG'";
