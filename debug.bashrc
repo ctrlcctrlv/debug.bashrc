@@ -53,7 +53,16 @@ print_all_bash_functions() {
     HIGHLIGHT_CMD="list_all_bash_functions "`printf '%q' "$1"`" | while read line; do print_bash_function \$line | syntaxhighlight bash; done"
     [ ! -z "$2" ] && (eval $HIGHLIGHT_CMD | aha $AHA_BASH_PRINT_ARGS > "$2") || (>&2 eval $HIGHLIGHT_CMD)
 }
+
 debugsh_init() {
+    debugsh_init_plugins
+    if [ ! -z "$NO_CCCV_DEBUG_BASHRC" ]; then
+        return 2
+    fi
+    local color_prompt
+    case "$TERM" in
+        xterm-color|*-256color) color_prompt="y";;
+    esac
     if [ ! -z "$BASH_SYNTAXHIGHLIGHTER_BINREQ" ]; then
         syntaxhighlighter "$BASH_SYNTAXHIGHLIGHTER_BINREQ"
     elif hash pygmentize; then
@@ -70,18 +79,13 @@ debugsh_init() {
     fi
     return 0
 }
-Deval() {
-    local BASH_SETTINGS="$-"
-    set -xv
-    # Runs the command. As safe as the original command :^)
-    $@
-    for setting in x v; do
-        if [[ ! $setting =~ $BASH_SETTINGS ]]; then
-            set "+$setting"
-        fi
+debugsh_init_plugins() {
+    local __DEBUG_DIRNAME=$(dirname -- "${BASH_SOURCE[0]}")
+    for plugin in `find "$__DEBUG_DIRNAME" -iname '*.sh'`; do
+        (readlink -f "$plugin" > /dev/null) && source "$plugin"
     done
 }
 
-export AHA_BASH_PRINT_ARGS='--black'
+declare -gx AHA_BASH_PRINT_ARGS='--black'
 
 debugsh_init && declare -gfx syntaxhighlight
