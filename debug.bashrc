@@ -61,7 +61,7 @@ debugsh_init() {
     fi
     local color_prompt
     case "$TERM" in
-        xterm-color|*-256color) color_prompt="y";;
+        xterm-*|*-{true,256}color) color_prompt="y";;
     esac
     if [ ! -z "$BASH_SYNTAXHIGHLIGHTER_BINREQ" ]; then
         syntaxhighlighter "$BASH_SYNTAXHIGHLIGHTER_BINREQ"
