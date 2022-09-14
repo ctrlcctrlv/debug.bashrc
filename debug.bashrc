@@ -81,8 +81,10 @@ debugsh_init() {
 }
 debugsh_init_plugins() {
     local __DEBUG_DIRNAME=$(dirname -- "${BASH_SOURCE[0]}")
-    for plugin in `find "$__DEBUG_DIRNAME" -iname '*.sh'`; do
-        (readlink -f "$plugin" > /dev/null) && source "$plugin"
+    local __PLUGINS=$(find "$__DEBUG_DIRNAME" -iregex '.*\.\(sh\|bashrc\)' -and -not -name 'debug.bashrc' -type f)
+    for plugin in $__PLUGINS; do
+        plugin=$(readlink -f "$plugin")
+        readlink -f "$plugin" > /dev/null && source "$plugin"
     done
 }
 
